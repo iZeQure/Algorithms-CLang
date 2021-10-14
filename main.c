@@ -2,9 +2,9 @@
 #include <stdlib.h>
 #include <time.h>
 
-#define ARRAY_LENGTH 20000
-#define LEN 5
-#define POPULATION_MAX_RANGE 1000000
+#define ARRAY_LENGTH 100000
+#define POPULATION_MAX_RANGE 50000
+#define RUN_BENCHMARK 10
 
 void run_me(void);
 void swap(int *x, int *y);
@@ -126,45 +126,59 @@ void populate_array(int *arr[], int n) {
 }
 
 int main(void) {
-    int numbers[ARRAY_LENGTH];
+    int benchmarking = 0;
+    double benchmarks[RUN_BENCHMARK];
 
-    populate_array((int **) numbers, ARRAY_LENGTH);
-    clock_t t = clock();
+    while (benchmarking < RUN_BENCHMARK) {
+        clock_t t = clock();
+        int numbers[ARRAY_LENGTH];
+        populate_array((int **) numbers, ARRAY_LENGTH);
+        selection_sort((int **) numbers, ARRAY_LENGTH);
+//        run_me();
+        t = clock() - t;
+        double time = ((double)t) / CLOCKS_PER_SEC;
+        printf("Finished in %f seconds on iteration %d.\n", time, benchmarking);
 
-    merge_sort_algorithm((int **) numbers, 0, ARRAY_LENGTH);
+        benchmarks[benchmarking] = time;
 
-    t = clock() - t;
-    double time = ((double)t) / CLOCKS_PER_SEC;
-    printf("Finished in %f seconds.\n", time);
+        benchmarking++;
+    }
 
-    clock_t t2 = clock();
+    printf("Calculating benchmarks..\n");
+    double result = 0;
 
+    for (int i = 0; i < RUN_BENCHMARK; ++i) {
+        result = result + benchmarks[i];
+    }
+
+    printf("Benchmark result: %f\n", result / RUN_BENCHMARK);
+
+    /*clock_t t2 = clock();
     run_me();
-
     t = clock() - t;
     double time2 = ((double)t) / CLOCKS_PER_SEC;
-    printf("Finished in %f seconds.\n", time2);
+    printf("Finished in %f seconds.\n", time2);*/
 
     return 0;
 }
 
 void run_me( void)
 {
-    int array[LEN];
-    createArray(&array, LEN);
-    printf("Array made\n");
-    printArray(&array, LEN);
+    int array[ARRAY_LENGTH];
+    createArray(&array, ARRAY_LENGTH);
+//    printf("Array made\n");
+//    printArray(&array, LEN);
     int *begin, *end;
     begin = &array;
-    end = begin + LEN - 1;
+    end = begin + ARRAY_LENGTH - 1;
     quicksort(begin, end);
-    printArray(array, LEN);
+//    printArray(array, LEN);
 }
 
 void quicksort(int *begin, int *end)
 {
-    printf("New call, array to sort:\n");
-    printArrayRange(begin, end);
+//    printf("New call, array to sort:\n");
+//    printArrayRange(begin, end);
     if(begin >= end) return; //there is one or less to sort
     int *p1, *p2;
     p1 = begin;
@@ -174,14 +188,14 @@ void quicksort(int *begin, int *end)
         if(*p1>*p2)
         {
             swap(p1, p2);
-            printArrayRange(begin, end);
+//            printArrayRange(begin, end);
         }
         return;
     }
     int *pivot;
     pivot = p1+((p2-p1)/2);
     int middle = *pivot;
-    printf("middle: %d, starting sorting\n", *pivot);
+//    printf("middle: %d, starting sorting\n", *pivot);
     while(p1<p2)
     {
         if(*p1 < middle) p1++;
@@ -190,12 +204,12 @@ void quicksort(int *begin, int *end)
         {
             swap(p1, p2);
             p1++;
-            printArrayRange(begin, end);
+//            printArrayRange(begin, end);
         }
     }
     if(*p1 >= middle) p1--;
-    printArrayRange(begin, end);
-    printf("done sorting\n");
+//    printArrayRange(begin, end);
+//    printf("done sorting\n");
     quicksort(begin, p1);
     p1++;
     quicksort(p1, end);
@@ -215,7 +229,7 @@ void createArray(int *array, int length)
     srand((unsigned) time(&t));
     for(int i = 0 ; i < length ; i++ )
     {
-        array[i] = rand() % 50;
+        array[i] = rand() % POPULATION_MAX_RANGE;
     }
 }
 void printArray(int *array, int length)
